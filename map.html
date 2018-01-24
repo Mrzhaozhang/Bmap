@@ -117,40 +117,46 @@
 				}
 			}
 			(siimpleTags[0]).onclick=function(){
-				add_overlay()
 				removeDrivingAll()
+				add_overlay()
 			}
 			function addMarker(){
-				pointArr.forEach((item)=>{
+				pointArr.forEach((item,index)=>{
 					var mark = new BMap.Marker(new BMap.Point(item[0],item[1]))
 					markerArr.push(mark)
 					map.addOverlay(mark);
 				})
 			}
-			function add_overlay(){
+			function add_overlay(){//添加路径信息
 				map.clearOverlays()
-				setTimeout(()=>{
-					addMarker();
-					analysis()
-				},0)
+				addMarker();
+				analysis()
 			}
-			function addDriving(lng,lat){
+			function addDriving(lng,lat){//添加路径信息
 				drivingArr.push([[lng,lat],[pointArr[0][0],pointArr[0][1]]]);
 				add_overlay()
+				var allOverlay = map.getOverlays();
+				map.removeOverlay(allOverlay[0])
 			}
-			function removeDriving(locationNum){
+			function removeDriving(locationNum){//清除指定路径信息
 				drivingArr.splice(locationNum,1);
 				drivingArrIndex.splice(locationNum,1);
 				add_overlay()
 			}
-			function removeDrivingAll(){
+			function removeDrivingAll(){//清除所有路径信息
 				drivingArr.splice(0,drivingArr.length);
 				drivingArrIndex.splice(0,drivingArrIndex.length);
 			}
-			function analysis(){
+			var starIcon = new BMap.Icon("./img/markers.png",new BMap.Size(0,0));
+			var endIcon = new BMap.Icon("./img/u50.png",new BMap.Size(15,14));
+			function analysis(){//添加路径信息
 				for (var i=0;i<drivingArr.length;i++) {
 					var driving = new BMap.DrivingRoute(map, {renderOptions:{map: map, autoViewport: false}});
 					driving.search(new BMap.Point(drivingArr[i][0][0],drivingArr[i][0][1]),new BMap.Point(drivingArr[i][1][0],drivingArr[i][1][1]))
+					driving.setMarkersSetCallback(function(result){
+						result[0].marker.setIcon(starIcon)
+						result[1].marker.setIcon(endIcon)
+					})
 				}
 			}
 		</script>
